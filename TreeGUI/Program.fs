@@ -12,7 +12,7 @@ type MainWindow() as this =
         base.Title <- "TreeGUI"
         base.Width <- 1000.0
         base.Height <- 1000.0
-        this.Content <- Counter.view
+        this.Content <- TreeViewer.view
 
         //this.VisualRoot.VisualRoot.Renderer.DrawFps <- true
         //this.VisualRoot.VisualRoot.Renderer.DrawDirtyRects <- true
