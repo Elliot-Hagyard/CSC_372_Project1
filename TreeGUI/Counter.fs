@@ -13,6 +13,38 @@ module TreeViewer =
 
     open Avalonia.Media
     open Avalonia.Controls.Shapes
+    let createText x y text = 
+        TextBlock.create [
+            TextBlock.width 64
+            TextBlock.horizontalAlignment HorizontalAlignment.Center
+            TextBlock.verticalAlignment VerticalAlignment.Top
+            //TODO
+            TextBlock.text $"{t.value}"
+        ]
+                        
+    let createRect x y rot = 
+            Rectangle.create [
+                Rectangle.width 5.0
+                Rectangle.height 100.0
+                Rectangle.fill (SolidColorBrush (Color.Parse "black"))
+                
+                Rectangle.renderTransform (
+                    RotateTransform 45.0
+                )
+
+                Canvas.left x
+                Canvas.top y
+            ]
+
+    let rec drawTree tree  =
+        match tree with
+        | Empty -> []
+        | Tree t -> 
+            match (t.left, t.right) with
+            | (Empty, Empty) -> [createText $"{t.value}"]
+            | (_, Empty) -> [createText $"{t.value}" createRect x y 45.0;]@drawTree t.left@drawTree t.right]
+            | (Empty, _) -> [createText //TODO ${t.value}; createRect x y -45.0]@drawTree t.left@drawTree t.right]
+            | (_, _) -> [createText //TODO ${t.value}; createRect x y 45.0; createRect x y -45.0]@drawTree t.left@drawTree t.right]
 
     let view =
         Component(fun ctx ->
