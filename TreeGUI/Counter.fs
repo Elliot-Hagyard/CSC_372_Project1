@@ -57,7 +57,15 @@ module TreeViewer =
             | (_, Empty) -> [createText $"{t.value}" point; createRect 45.0 point;] @ drawTree t.left (left point)
             | (Empty, _) -> [createText $"{t.value}" point; createRect -45.0 point] @ drawTree t.right (right point)
             | (_, _) -> [createText $"{t.value}" point; createRect -45.0 point; createRect 45.0 point;]@ drawTree t.left (left point) @ drawTree t.right (right point)
+    
+
+
     let view =
+        let mutable c_equivalent = Empty
+        c_equivalent <- insert 10 c_equivalent
+        c_equivalent <- insert 5 c_equivalent
+        c_equivalent <- insert 4 c_equivalent
+        c_equivalent <- insert 20 c_equivalent
         Component(fun ctx ->
             let state = ctx.useState 0
             DockPanel.create [
@@ -69,9 +77,10 @@ module TreeViewer =
 
                         Canvas.height 400.0
                         Canvas.background Brushes.Transparent
-                        Canvas.children [drawTree tree] 
+                        Canvas.children (([] :  Types.IView list) @ drawTree c_equivalent {x=0.0; y=0.0})
 
                 ]
+            ]
 
             ]
         )
