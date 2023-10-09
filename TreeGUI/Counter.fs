@@ -13,7 +13,11 @@ module TreeViewer =
 
     open Avalonia.Media
     open Avalonia.Controls.Shapes
-    let createText x y text = 
+    type point = {
+        x : float
+        y : float
+    }
+    let createText text point = 
         TextBlock.create [
             TextBlock.width 64
             TextBlock.horizontalAlignment HorizontalAlignment.Center
@@ -22,7 +26,7 @@ module TreeViewer =
             TextBlock.text $"{t.value}"
         ]
                         
-    let createRect x y rot = 
+    let createRect rot point = 
             Rectangle.create [
                 Rectangle.width 5.0
                 Rectangle.height 100.0
@@ -35,16 +39,16 @@ module TreeViewer =
                 Canvas.left x
                 Canvas.top y
             ]
-
-    let rec drawTree tree  =
+    // Point is the current point
+    let rec drawTree tree point =
         match tree with
         | Empty -> []
         | Tree t -> 
             match (t.left, t.right) with
-            | (Empty, Empty) -> [createText $"{t.value}"]
+            | (Empty, Empty) -> [createText $"{t.value}" x y]
             | (_, Empty) -> [createText $"{t.value}" createRect x y 45.0;]@drawTree t.left@drawTree t.right]
-            | (Empty, _) -> [createText //TODO ${t.value}; createRect x y -45.0]@drawTree t.left@drawTree t.right]
-            | (_, _) -> [createText //TODO ${t.value}; createRect x y 45.0; createRect x y -45.0]@drawTree t.left@drawTree t.right]
+            | (Empty, _) -> [createText ${t.value}; createRect point{x=x; y=y} -45.0]@drawTree t.left@drawTree t.right]
+            | (_, _) -> [createText ${t.value}; createRect x y 45.0; createRect x y -45.0]@drawTree t.left@drawTree t.right]
 
     let view =
         Component(fun ctx ->
