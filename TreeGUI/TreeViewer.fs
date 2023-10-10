@@ -24,31 +24,41 @@ module TreeViewer =
     }
 
     // F# has a weird way of handling radians/degrees...
+    // Sin and Cos take rad
+    // Rect transform takes degrees
     let angle = 80.0 * (System.Math.PI/180.0)
-    let min_angle = 9.0 * (System.Math.PI/180.0) 
-    let fromRad = (180.0/System.Math.PI)
+    // Define a minimum angle so children don't run into each other
+    let min_angle = 8.0 * (System.Math.PI/180.0) 
+    let fromRad x = x*(180.0/System.Math.PI)
 
     let sin x = System.Math.Sin x
     let cos x = System.Math.Cos x
     
+    // Defining a bunch of different parameters
     let width = 30.0
     let height = 20.0
-    let rect_height = 80.0
+    let rect_height = 90.0
     let shrink_factor = 2.5
 
     // Increment the position of the next GUI element depending on the branch of the tree
-    let left  point rot = {x = point.x - rect_height*sin(rot); y = point.y + rect_height*cos(rot) + height}
-    let right point rot = {x = point.x + rect_height*sin(rot); y = point.y + rect_height*cos(rot) + height}
+    let left  point rot = {
+        x = point.x - rect_height*sin(rot); 
+        y = point.y + rect_height*cos(rot) + height
+        }
+    let right point rot = {
+        x = point.x + rect_height*sin(rot);
+        y = point.y + rect_height*cos(rot) + height
+        }
 
     
     // Create a text box representing a node
     let createText text point =
         TextBlock.create [
-                TextBlock.width (float (String.length text)*10.0)
+                TextBlock.width (float(String.length text)*10.0)
                 TextBlock.height height
                 TextBlock.text text
 
-                Canvas.left (point.x - (float (String.length text)*5.0) )
+                Canvas.left (point.x - (float(String.length text)*2.5))
                 Canvas.top (point.y + height)
             ]
 
@@ -62,8 +72,8 @@ module TreeViewer =
             TextBlock.horizontalAlignment HorizontalAlignment.Center
 
             Rectangle.fill (SolidColorBrush (Color.Parse "black"))
-            Rectangle.renderTransform(RotateTransform (fromRad*rot))
-
+            Rectangle.renderTransform(RotateTransform (fromRad rot))
+            // Rotation around means we need to offset the rectangle
             Canvas.left (point.x - rect_height*sin(rot)/2.0)
             Canvas.top  (point.y + rect_height*cos(rot)/2.0)
         ]
@@ -73,28 +83,23 @@ module TreeViewer =
 
         // Set the max angle that the branches can have
         let ang = max curAngle min_angle
-
+        let nextAngle = ang/shrink_factor
         match tree with
-
         // If the tree is empty return an empty list
         | Empty -> [] : Types.IView list
-
         | Tree t -> 
             match (t.left, t.right) with
-
             // If the L/R subtrees are empty, print the value at the node
             | (Empty, Empty) -> [createText $"{t.value}" point]
-
             // If one of the subtrees are empty, recurse on the non-empty one
-            | (_, Empty) -> [createText $"{t.value}" point; createRect ang point;] @ drawTree t.left (left point ang) (ang/shrink_factor)
-            | (Empty, _) -> [createText $"{t.value}" point; createRect -ang point] @ drawTree t.right (right point ang) (ang/shrink_factor)
-            
+            | (_, Empty) -> [createText $"{t.value}" point; createRect ang point;] @ drawTree t.left (left point ang) nextAngle
+            | (Empty, _) -> [createText $"{t.value}" point; createRect -ang point] @ drawTree t.right (right point ang) nextAngle
             // If neither subtree is empty, recurse on both subtrees
             | (_, _) -> 
                 [createText $"{t.value}" point; 
                 createRect -ang point; 
                 createRect ang point;
-                ]@ drawTree t.left (left point (ang)) (ang/shrink_factor) @ drawTree t.right (right point (ang)) (ang/shrink_factor)
+                ]@ drawTree t.left (left point (ang)) nextAngle @ drawTree t.right (right point (ang)) nextAngle
 
 
     (*Insertion methods and TreeViewer application tests*)
@@ -128,11 +133,13 @@ module TreeViewer =
     // TREE 4 should be unbalanced and biased to the right
     let l4 = [1;2;3;4;5;6;7]
     let t4 = addToTree l4 Empty
-
+    
     // Draw the GUI components that visualize the BST
     let view =
         let mutable input =  ""
         Component(fun ctx ->
+            // UI's need state, 
+            // but functional paradigms dislike it, so it's passed in as a parameter
             let state = ctx.useState t1 // CHANGE THIS LINE TO TEST THE DIFFERENT TREES
             DockPanel.create [
                 DockPanel.verticalAlignment VerticalAlignment.Top
@@ -143,10 +150,12 @@ module TreeViewer =
                         Canvas.background Brushes.Transparent
                         Canvas.children (([] :  Types.IView list) @ drawTree state.Current {x=0.0; y=100.0} angle)
                     ]
+                    // Add the panel Controls
                     StackPanel.create [
                         StackPanel.dock Dock.Bottom
                         StackPanel.verticalAlignment VerticalAlignment.Bottom
                         StackPanel.children [
+                            // text box for input of ints.
                             TextBox.create [
                                 TextBox.horizontalAlignment HorizontalAlignment.Left
                                 TextBox.width 100.0
@@ -174,7 +183,6 @@ module TreeViewer =
                                     | _ -> ()
                                 )
                             ]
-
                             Button.create [
                                 TextBox.width 100.0
                                 Button.content "Clear"
@@ -183,12 +191,12 @@ module TreeViewer =
                             ]
                         ]
                     ]
+                    // Display the Height at the top of the page
                     StackPanel.create [
                         StackPanel.children [
                             TextBlock.create [
                                 TextBlock.width 200.0
                                 TextBlock.height height
-                                    // TextBlock.verticalAlignment // Is this necessary?
                                 TextBlock.text $"Height {Tree.height state.Current}"
                             ]
                         ]
