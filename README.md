@@ -2,8 +2,7 @@
 
 ## Authors
 
-M. Fay Garcia
-Elliot Hagyard
+M. Fay Garcia, Elliot Hagyard
 
 ## Descriptive Overview
 
