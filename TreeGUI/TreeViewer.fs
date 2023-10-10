@@ -59,7 +59,7 @@ module TreeViewer =
                 TextBlock.text text
 
                 Canvas.left (point.x - (float(String.length text)*2.5))
-                Canvas.top (point.y + height)
+                Canvas.top (point.y + height + 5.0)
             ]
 
     // Create a line between two nodes
