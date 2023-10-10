@@ -35,8 +35,11 @@ dotnet run
 This will open the BST Visualizer and initialize it with the default tree.
 
 To run the BST Visualizer on a different test tree:
+***
     1. Quit out of the Visualizer application (not the terminal)
+***
     2. Open "TreeViewer.fs" and follow the instructions in ln. 100
+***
     3. Use the "dotnet run" command in your terminal again
 
 
