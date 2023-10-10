@@ -41,7 +41,7 @@ module TreeViewer =
                 TextBlock.height height
                 // TextBlock.verticalAlignment // Is this necessary?
                 TextBlock.text text
-                Canvas.left (point.x)
+                Canvas.left (point.x - (float (String.length text)*5.0) )
                 Canvas.top (point.y + height/2.0)
             ]
 
@@ -66,8 +66,8 @@ module TreeViewer =
         | Tree t -> 
             match (t.left, t.right) with
             | (Empty, Empty) -> [createText $"{t.value}" point]
-            | (_, Empty) -> [createText $"{t.value}" point; createRect -curAngle point;] @ drawTree t.left (left point curAngle) (curAngle/2.0)
-            | (Empty, _) -> [createText $"{t.value}" point; createRect curAngle point] @ drawTree t.right (right point curAngle) (curAngle/2.0)
+            | (_, Empty) -> [createText $"{t.value}" point; createRect curAngle point;] @ drawTree t.left (left point curAngle) (curAngle/2.0)
+            | (Empty, _) -> [createText $"{t.value}" point; createRect -curAngle point] @ drawTree t.right (right point curAngle) (curAngle/2.0)
             | (_, _) -> 
                 printfn $"{point}"
                 [createText $"{t.value}" point; 
@@ -86,6 +86,10 @@ module TreeViewer =
         c_equivalent <- insert 100 c_equivalent
         c_equivalent <- insert 15 c_equivalent
         c_equivalent <- insert 6 c_equivalent
+        c_equivalent <- insert -5 c_equivalent
+        c_equivalent <- insert 120 c_equivalent
+        c_equivalent <- insert 3 c_equivalent
+        
         Component(fun ctx ->
             let state = ctx.useState 0
             DockPanel.create [
