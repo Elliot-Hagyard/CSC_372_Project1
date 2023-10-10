@@ -5,12 +5,17 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
+  <!-- These statements must be written in the order you want the
+       files to be compiled -->
   <ItemGroup>
     <Compile Include="Tree.fs" />
-    <Compile Include="Counter.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="TreeViewer.fs" />
+    <Compile Include="TestTree.fs" />
+    <!-- We must compile the entry point last -->
+    <Compile Include="Program.fs" /> 
   </ItemGroup>
 
+  <!-- General Avalonia packages -->
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12" />
