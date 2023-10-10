@@ -10,7 +10,6 @@
   <ItemGroup>
     <Compile Include="Tree.fs" />
     <Compile Include="TreeViewer.fs" />
-    <Compile Include="TestTree.fs" />
     <!-- We must compile the entry point last -->
     <Compile Include="Program.fs" /> 
   </ItemGroup>
