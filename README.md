@@ -21,6 +21,8 @@ brew install --cask dotnet
 
 ```
 
+### Console Application
+
 Once installed, change into the TreeGUI directory and run the console application
 using the following command:
 
@@ -36,6 +38,9 @@ To run the BST Visualizer on a different test tree:
     1. Quit out of the Visualizer application (not the terminal)
     2. Open "TreeViewer.fs" and follow the instructions in ln. 100
     3. Use the "dotnet run" command in your terminal again
+
+
+### Basic Tree Tests
 
 To run the basic tree tests, run "TestTree.fsx" using the following command in your terminal:
 
