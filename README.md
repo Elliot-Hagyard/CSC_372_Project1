@@ -7,19 +7,21 @@ Elliot Hagyard
 
 ## Descriptive Overview
 
-In F#, this project implments both a Binary Search Tree in and a rudimentary application
+In F#, this project implments both a Binary Search Tree and a rudimentary application
 to visualize the tree. The application utilizes the Avalonia library to build a GUI.
 
 ## Running the Code
 
-To run the code, you need to have the dotnet runtime environment installed.
+To run the code, you need to have the dotnet source development kit installed.
 To install on Mac with Homebrew, run the following command in your terminal:
 
 ```bash
 
-brew install --cask dotnet
+brew install dotnet-sdk
 
 ```
+
+This command also installs the dotnet runtime environment.
 
 ### Console Application
 
@@ -31,8 +33,10 @@ using the following command:
 dotnet run
 
 ```
+If a notification pops up saying the application couldn't be opened for security reasons,
+you can go into your settings under "Privacy & Security" to bypass it.
 
-This will open the BST Visualizer and initialize it with the default tree.
+Otherwise, this command will open the BST Visualizer and initialize it with the default tree.
 
 To run the BST Visualizer on a different test tree:
 
