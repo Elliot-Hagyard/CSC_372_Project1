@@ -19,32 +19,46 @@ module TreeViewer =
         x : float
         y : float
     }
-
-    let left point = {x = point.x - 20.0; y = point.y + 20.0}
-    let right point  = {x = point.x + 20.0; y = point.y + 20.0}
+    type Orientation = 
+    | Left
+    | Right
     
-    let createText text point = 
+    let width = 30.0
+    let height = 20.0
+    let rect_height = 50.0
+    let mutable angle = 45.0
+    let left point = {x = point.x - rect_height*sin(angle); y = point.y + rect_height*cos(angle) + height}
+    let right point  = {x = point.x + rect_height*sin(angle); y = point.y + rect_height*cos(angle) + height}
+    let angleInRadians degree = System.Math.PI / 180.0 * degree
+    let sin = angleInRadians >> System.Math.Sin
+    let cos = angleInRadians >> System.Math.Cos
+    
+
+    let createText text point =
         TextBlock.create [
-                TextBlock.width 64
-                TextBlock.horizontalAlignment HorizontalAlignment.Center // Is this necessary?
+                TextBlock.width (float (String.length text)*10.0)
+                TextBlock.height height
+                TextBlock.verticalAlignment VerticalAlignment.Center
+                TextBlock.horizontalAlignment HorizontalAlignment.Left // Is this necessary?
                 // TextBlock.verticalAlignment // Is this necessary?
                 TextBlock.text text
-
-                Canvas.left point.x
-                Canvas.top point.y
+                Canvas.left (point.x)
+                Canvas.top (point.y + height/2.0)
             ]
+
     
     let createRect rot point =
         // rot is 45.0 or -45.0
         // alignment?
         Rectangle.create [
-            Rectangle.width 2.5
-            Rectangle.height 50.0
+            Rectangle.width 1.0
+            Rectangle.height rect_height
+            TextBlock.verticalAlignment VerticalAlignment.Center
+            TextBlock.horizontalAlignment HorizontalAlignment.Center
             Rectangle.fill (SolidColorBrush (Color.Parse "black"))
             Rectangle.renderTransform(RotateTransform rot)
-
-            Canvas.left point.x
-            Canvas.top point.y
+            Canvas.left (point.x - rect_height*sin(rot)/2.0)
+            Canvas.top  (point.y + height/2.0 + rect_height*cos(rot)/2.0)
             
         ]
             
@@ -54,9 +68,9 @@ module TreeViewer =
         | Tree t -> 
             match (t.left, t.right) with
             | (Empty, Empty) -> [createText $"{t.value}" point]
-            | (_, Empty) -> [createText $"{t.value}" point; createRect 45.0 point;] @ drawTree t.left (left point)
-            | (Empty, _) -> [createText $"{t.value}" point; createRect -45.0 point] @ drawTree t.right (right point)
-            | (_, _) -> [createText $"{t.value}" point; createRect -45.0 point; createRect 45.0 point;]@ drawTree t.left (left point) @ drawTree t.right (right point)
+            | (_, Empty) -> [createText $"{t.value}" point; createRect angle point;] @ drawTree t.left (left point)
+            | (Empty, _) -> [createText $"{t.value}" point; createRect -angle point] @ drawTree t.right (right point)
+            | (_, _) -> [createText $"{t.value}" point; createRect -angle point; createRect angle point;]@ drawTree t.left (left point) @ drawTree t.right (right point)
     
 
 
@@ -66,6 +80,9 @@ module TreeViewer =
         c_equivalent <- insert 5 c_equivalent
         c_equivalent <- insert 4 c_equivalent
         c_equivalent <- insert 20 c_equivalent
+        c_equivalent <- insert 100 c_equivalent
+        c_equivalent <- insert 15 c_equivalent
+        c_equivalent <- insert 6 c_equivalent
         Component(fun ctx ->
             let state = ctx.useState 0
             DockPanel.create [
@@ -74,48 +91,11 @@ module TreeViewer =
                 DockPanel.children [
                     
                     Canvas.create [ // Remember to initialize position
-
-                        Canvas.height 400.0
+                        Canvas.height 850.0
                         Canvas.background Brushes.Transparent
-                        Canvas.children (([] :  Types.IView list) @ drawTree c_equivalent {x=0.0; y=0.0})
-
-                ]
-            ]
+                        Canvas.children (([] :  Types.IView list) @ drawTree c_equivalent {x=0.0; y=200.0})
+                        ]
+                    ]
 
             ]
         )
-
-
-
- // DockPanel.children [
-                //     Button.create [
-                //         Button.width 64
-                //         Button.horizontalAlignment HorizontalAlignment.Center
-                //         Button.horizontalContentAlignment HorizontalAlignment.Center
-                //         Button.content "Reset"
-                //         Button.onClick (fun _ -> state.Set 0)
-                //         Button.dock Dock.Bottom
-                //     ]
-                //     Button.create [
-                //         Button.width 64
-                //         Button.horizontalAlignment HorizontalAlignment.Center
-                //         Button.horizontalContentAlignment HorizontalAlignment.Center
-                //         Button.content "Build"
-                //         Button.onClick (fun _ -> state.Current - 1 |> state.Set)
-                //         Button.dock Dock.Bottom
-                //     ]
-                //     Button.create [
-                //         Button.width 64
-                //         Button.horizontalAlignment HorizontalAlignment.Center
-                //         Button.horizontalContentAlignment HorizontalAlignment.Center
-                //         Button.content "+"
-                //         Button.onClick (fun _ -> state.Current + 1 |> state.Set)
-                //         Button.dock Dock.Bottom
-                //     ]
-                //     TextBlock.create [
-                //         TextBlock.dock Dock.Top
-                //         TextBlock.fontSize 48.0
-                //         TextBlock.horizontalAlignment HorizontalAlignment.Center
-                //         TextBlock.text (string state.Current)
-                //     ]
-                // ]
