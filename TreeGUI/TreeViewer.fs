@@ -103,7 +103,7 @@ module TreeViewer =
 
 
     (*Insertion methods and TreeViewer application tests*)
-    (*TREE OPTIONS: Choose one and replace "tree" in ln. 104 with the variable name.
+    (*TREE OPTIONS: Choose one and replace "tree" in ln. 136 with the variable name.
                     The default test variable is t1*)
 
     // TREE 1 should be balanced
