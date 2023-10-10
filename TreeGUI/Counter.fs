@@ -22,24 +22,23 @@ module TreeViewer =
     type Orientation = 
     | Left
     | Right
+    | Middle
     
     let width = 30.0
     let height = 20.0
     let rect_height = 50.0
-    let mutable angle = 45.0
-    let left point = {x = point.x - rect_height*sin(angle); y = point.y + rect_height*cos(angle) + height}
-    let right point  = {x = point.x + rect_height*sin(angle); y = point.y + rect_height*cos(angle) + height}
-    let angleInRadians degree = System.Math.PI / 180.0 * degree
-    let sin = angleInRadians >> System.Math.Sin
-    let cos = angleInRadians >> System.Math.Cos
+    let angle = 80.0 * (System.Math.PI/180.0)
+    let fromRad = (180.0/System.Math.PI)
+    let left point  rot = {x = point.x - rect_height*sin(rot); y = point.y + rect_height*cos(rot) + height}
+    let right point rot = {x = point.x + rect_height*sin(rot); y = point.y + rect_height*cos(rot) + height}
+    let sin x = System.Math.Sin ( x)
+    let cos x = System.Math.Cos ( x)
     
-
+    
     let createText text point =
         TextBlock.create [
                 TextBlock.width (float (String.length text)*10.0)
                 TextBlock.height height
-                TextBlock.verticalAlignment VerticalAlignment.Center
-                TextBlock.horizontalAlignment HorizontalAlignment.Left // Is this necessary?
                 // TextBlock.verticalAlignment // Is this necessary?
                 TextBlock.text text
                 Canvas.left (point.x)
@@ -56,21 +55,25 @@ module TreeViewer =
             TextBlock.verticalAlignment VerticalAlignment.Center
             TextBlock.horizontalAlignment HorizontalAlignment.Center
             Rectangle.fill (SolidColorBrush (Color.Parse "black"))
-            Rectangle.renderTransform(RotateTransform rot)
+            Rectangle.renderTransform(RotateTransform (fromRad*rot))
             Canvas.left (point.x - rect_height*sin(rot)/2.0)
-            Canvas.top  (point.y + height/2.0 + rect_height*cos(rot)/2.0)
-            
+            Canvas.top  (point.y + rect_height*cos(rot)/2.0)
         ]
             
-    let rec drawTree tree point =
+    let rec drawTree tree point curAngle =
         match tree with
         | Empty -> [] : Types.IView list
         | Tree t -> 
             match (t.left, t.right) with
             | (Empty, Empty) -> [createText $"{t.value}" point]
-            | (_, Empty) -> [createText $"{t.value}" point; createRect angle point;] @ drawTree t.left (left point)
-            | (Empty, _) -> [createText $"{t.value}" point; createRect -angle point] @ drawTree t.right (right point)
-            | (_, _) -> [createText $"{t.value}" point; createRect -angle point; createRect angle point;]@ drawTree t.left (left point) @ drawTree t.right (right point)
+            | (_, Empty) -> [createText $"{t.value}" point; createRect -curAngle point;] @ drawTree t.left (left point curAngle) (curAngle/2.0)
+            | (Empty, _) -> [createText $"{t.value}" point; createRect curAngle point] @ drawTree t.right (right point curAngle) (curAngle/2.0)
+            | (_, _) -> 
+                printfn $"{point}"
+                [createText $"{t.value}" point; 
+                createRect -curAngle point; 
+                createRect curAngle point;
+                ]@ drawTree t.left (left point (curAngle)) (curAngle/2.0) @ drawTree t.right (right point (curAngle)) (curAngle/2.0)
     
 
 
@@ -93,7 +96,7 @@ module TreeViewer =
                     Canvas.create [ // Remember to initialize position
                         Canvas.height 850.0
                         Canvas.background Brushes.Transparent
-                        Canvas.children (([] :  Types.IView list) @ drawTree c_equivalent {x=0.0; y=200.0})
+                        Canvas.children (([] :  Types.IView list) @ drawTree c_equivalent {x=0.0; y=200.0} angle)
                         ]
                     ]
 
