@@ -31,7 +31,6 @@ type App() =
         | _ -> ()
 
 module Program =
-
     [<EntryPoint>]
     let main(args: string[]) =
         AppBuilder
